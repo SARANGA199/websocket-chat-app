@@ -38,46 +38,6 @@ type Message struct {
 	ReadAt      primitive.DateTime `bson:"read_at" json:"read_at"`
 }
 
-// func handleConnections(w http.ResponseWriter, r *http.Request) {
-// 	conn, err := upgrader.Upgrade(w, r, nil)
-// 	if err != nil {
-// 		log.Println("Error upgrading WebSocket:", err)
-// 		return
-// 	}
-
-// 	defer conn.Close()
-
-// 	userID := r.URL.Query().Get("userId")
-// 	if userID == "" {
-// 		log.Println("No userId provided")
-// 		return
-// 	}
-
-// 	mu.Lock()
-// 	clients[userID] = append(clients[userID], conn)
-// 	fmt.Println("11111111", clients[userID])
-// 	mu.Unlock()
-
-// 	defer removeConnection(userID, conn)
-
-// 	for {
-// 		var msg map[string]interface{}
-// 		if err := conn.ReadJSON(&msg); err != nil {
-// 			log.Println("Error reading message:", err)
-// 			break
-// 		}
-
-// 		eventType := msg["type"].(string)
-// 		log.Println("Received message:", msg)
-// 		switch eventType {
-// 		case "message":
-// 			handleMessage(msg)
-// 		case "read_receipt":
-// 			log.Println("Handling read receipt")
-// 		}
-// 	}
-// }
-
 func handleConnections(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -170,22 +130,6 @@ func handleMessage(msg map[string]interface{}) {
 	wsmanager.Manager.BroadcastMessage(receiverId, msg)
 	// Send message to all sender connections (for real-time UI updates)
 	wsmanager.Manager.BroadcastMessage(senderId, msg)
-}
-
-func broadcastMessage(userID string, message Message) {
-	mu.Lock()
-	defer mu.Unlock()
-
-	connections, exists := clients[userID]
-	if !exists {
-		return
-	}
-
-	for _, conn := range connections {
-		if err := conn.WriteJSON(message); err != nil {
-			log.Println("Error sending message:", err)
-		}
-	}
 }
 
 // Start WebSocket server
