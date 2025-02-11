@@ -77,27 +77,6 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func removeConnection(userID string, conn *websocket.Conn) {
-	mu.Lock()
-	defer mu.Unlock()
-
-	connections, exists := clients[userID]
-	if !exists {
-		return
-	}
-
-	for i, c := range connections {
-		if c == conn {
-			clients[userID] = append(connections[:i], connections[i+1:]...)
-			break
-		}
-	}
-
-	if len(clients[userID]) == 0 {
-		delete(clients, userID)
-	}
-}
-
 func handleMessage(msg map[string]interface{}) {
 	senderId := msg["senderId"].(string)
 	receiverId := msg["receiverId"].(string)

@@ -49,6 +49,7 @@ const WebSocketChat = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  //Connect web socket
   const connectWebSocket = () => {
     if (userId.trim() !== "" && recipientId.trim() !== "") {
       const socket = new WebSocket(`ws://localhost:8080/ws?userId=${userId}`);
