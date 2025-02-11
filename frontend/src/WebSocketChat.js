@@ -49,10 +49,9 @@ const WebSocketChat = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  //Connect web socket
   const connectWebSocket = () => {
     if (userId.trim() !== "" && recipientId.trim() !== "") {
-      const socket = new WebSocket(`ws://localhost:8080/ws?userId=${userId}`);
+      const socket = new WebSocket(`ws://localhost:7000/falkon/notify/api/v1/websocket/connect?userId=${userId}`);
       setWs(socket);
 
       socket.onopen = () => {
