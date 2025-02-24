@@ -22,12 +22,32 @@ const WebSocketChat = () => {
       ws.onmessage = (event) => {
         const receivedData = JSON.parse(event.data);
         console.log("Received message:", receivedData);
-
-        if (receivedData.type === "message" && receivedData.message) {
-          setMessages((prev) => [...prev, receivedData.message]); 
+  
+        if (receivedData.type === "message" && Array.isArray(receivedData.message)) {
+          setMessages((prevMessages) => {
+            // Create a copy of previous messages
+            const updatedMessages = [...prevMessages];
+  
+            receivedData.message.forEach((newMessage) => {
+              // Find the index of the message that needs to be updated
+              const existingMessageIndex = updatedMessages.findIndex(
+                (msg) => msg.id === newMessage.id
+              );
+  
+              if (existingMessageIndex !== -1) {
+                // If message exists, update it
+                updatedMessages[existingMessageIndex] = newMessage;
+              } else {
+                // If it's a new message, add it to the list
+                updatedMessages.push(newMessage);
+              }
+            });
+  
+            return updatedMessages;
+          });
         }
       };
-
+  
       ws.onclose = () => {
         console.log("WebSocket disconnected");
         setConnected(false);
@@ -41,7 +61,7 @@ const WebSocketChat = () => {
 
   const connectWebSocket = () => {
     if (userId.trim() !== "" && recipientId.trim() !== "") {
-      const socket = new WebSocket(`ws://smsdev.falkon.ind.in/falkon/notify/api/v1/websocket/connect?userId=${userId}`);
+      const socket = new WebSocket(`ws://localhost:7000/falkon/notify/api/v1/websocket/connect?userId=${userId}`);
       setWs(socket);
 
       socket.onopen = () => {
@@ -55,7 +75,7 @@ const WebSocketChat = () => {
 
   const fetchChatHistory = async () => {
     try {
-      const response = await fetch(`https://smsdev.falkon.ind.in/falkon/notify/api/v1/secureChat/history/+12407461350?p=1`);
+      const response = await fetch(`http://localhost:7000/falkon/notify/api/v1/secureChat/history/+12407461350?p=1`);
       const data = await response.json();
       console.log("Chat history response: 1111111111111", data);
       if (data ) {
