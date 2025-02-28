@@ -114,12 +114,14 @@ func handleMessage(msg map[string]interface{}) {
 // Start WebSocket server
 func main() {
 	var err error
-	clientOptions := options.Client().ApplyURI("mongodb://falkonSMS-teams-notifications-dev-db-usr:3gxj6wz5YoMp@131.153.203.245:49156,131.153.11.99:49156/falkonsms-teams-notifications-dev-db?replicaSet=falkonSystems")
+	//add mongo URL
+	clientOptions := options.Client().ApplyURI("")
 	client, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
-	collection = client.Database("falkonsms-teams-notifications-dev-db").Collection("secureMessages")
+	//ADD Database name and collection name
+	collection = client.Database("CHAT").Collection("Messages")
 
 	http.HandleFunc("/ws", handleConnections)
 	log.Println("WebSocket server started on ws://localhost:8080/ws")
